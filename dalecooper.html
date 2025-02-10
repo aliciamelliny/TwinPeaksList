@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Twin Peaks</title>
+    <link href='https://fonts.googleapis.com/css?family=Oswald:400,700' rel='stylesheet' type='text/css'>
+    <style>
+        @font-face {
+            font-family: 'TwinPeaksFont';
+            src: url('OPTINational-Gothic.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        /* Estilos gerais */
+        body {
+            font-family: 'TwinPeaksFont', 'Oswald', sans-serif;
+            background-image: linear-gradient(#fc0500, #690503);
+            background-repeat: no-repeat;
+            background-size: cover;
+            height: 100%;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .main-header {
+            background-image: url('https://i.imgur.com/gm685cl.jpeg');
+            background-size: cover;
+            background-position: center;
+            padding: 50px 20px;
+            border-bottom: 5px solid #d9534f;
+            text-align: center;
+        }
+
+        h1 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            font-size: 5.625rem;
+            color: #593125;
+            -webkit-text-stroke-width: 3px;
+            -webkit-text-stroke-color: #1a8f1d;
+            text-shadow: 5px 5px 5px #000;
+        }
+
+        h2 {
+            color: #d9534f;
+            text-shadow: 2px 2px 5px #000;
+            font-family: 'TwinPeaksFont', 'Oswald', sans-serif;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #262626;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        #todo-form {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        #todo-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #d9534f;
+            border-radius: 5px;
+            background-color: #333;
+            color: #fff;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #d9534f;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 1em;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        button:hover {
+            background-color: #c9302c;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        li {
+            background-color: #333;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        li.completed {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+
+        .delete-btn {
+            background-color: #ff4444;
+            border: none;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #262626;
+            color: #888;
+            font-size: 0.9em;
+        }
+
+        footer a {
+            color: #d9534f;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>TWIN PEAKS</h1>
+        <h2>Lista de Afazeres do Black Lodge</h2>
+    </header>
+
+    <div class="container">
+        <form id="todo-form">
+            <input type="text" id="todo-input" placeholder="Adicione uma tarefa...">
+            <button type="submit">Adicionar</button>
+        </form>
+
+        <ul id="todo-list">
+            <!-- Tarefas serão adicionadas aqui via JavaScript -->
+        </ul>
+    </div>
+
+    <footer>
+        <p>The owls are not what they seem. 🦉</p>
+    </footer>
+
+    <script>
+        const todoForm = document.getElementById('todo-form');
+        const todoInput = document.getElementById('todo-input');
+        const todoList = document.getElementById('todo-list');
+
+        todoForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const newTask = todoInput.value.trim();
+
+            if (newTask !== '') {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    ${newTask}
+                    <button class="delete-btn">Deletar</button>
+                `;
+                todoList.appendChild(li);
+                todoInput.value = '';
+
+                li.addEventListener('click', function () {
+                    li.classList.toggle('completed');
+                });
+
+                const deleteBtn = li.querySelector('.delete-btn');
+                deleteBtn.addEventListener('click', function () {
+                    li.remove();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
