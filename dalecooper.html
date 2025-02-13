@@ -13,17 +13,22 @@
             font-style: normal;
         }
 
-        /* Estilos gerais */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'TwinPeaksFont', 'Oswald', sans-serif;
             background-image: linear-gradient(#fc0500, #690503);
             background-repeat: no-repeat;
             background-size: cover;
-            height: 100%;
             color: #fff;
-            margin: 0;
-            padding: 0;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 60px;
         }
 
         .main-header {
@@ -51,14 +56,23 @@
             font-family: 'TwinPeaksFont', 'Oswald', sans-serif;
         }
 
-        .container {
+        .input-container, .list-container {
             max-width: 600px;
+            width: 100%;
             margin: 20px auto;
             padding: 20px;
-            background-image: url('images/Black_Lodge.jpg');
-            background-size: 100pt;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .input-container {
+            background-image: url('images/Black_Lodge.jpg'); 
+            background-size: 200px;
+            background-position: center;
+        }
+
+        .list-container {
+            background-color: rgba(0, 0, 0, 0.5);
         }
 
         #todo-form {
@@ -72,7 +86,7 @@
             padding: 10px;
             border: 2px solid #d9534f;
             border-radius: 5px;
-            background-color: #333;
+            background-color: rgba(51, 51, 51, 0.8); 
             color: #fff;
             font-size: 1em;
         }
@@ -103,32 +117,49 @@
             margin-bottom: 10px;
             border-radius: 5px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
             cursor: pointer;
         }
 
-        li.completed {
+        .task-text {
+            flex: 1;
+            margin-left: 10px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+        }
+
+        .task-text.completed {
             text-decoration: line-through;
             opacity: 0.6;
         }
 
-        .delete-btn {
-            background-color: #ff4444;
-            border: none;
-            color: #fff;
-            padding: 5px 10px;
-            border-radius: 5px;
+        .task-checkbox {
+            margin: 0;
             cursor: pointer;
         }
 
+        .delete-btn {
+            background: none;
+            border: none;
+            color: #ff4444;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-left: 10px;
+            padding: 0;
+        }
+
         .delete-btn:hover {
-            background-color: #cc0000;
+            color: #cc0000;
+            background: none; 
         }
 
         footer {
+            position: fixed; 
+            bottom: 0;
+            left: 0;
+            width: 100%;
             text-align: center;
-            margin-top: 20px;
             padding: 10px;
             background-color: #262626;
             color: #888;
@@ -151,14 +182,16 @@
         <h2>Diário do Black Lodge</h2>
     </header>
 
-    <div class="container">
+    <div class="input-container">
         <form id="todo-form">
             <input type="text" id="todo-input" placeholder="Adicione uma tarefa...">
             <button type="submit">Adicionar</button>
         </form>
+    </div>
 
+    <div class="list-container">
         <ul id="todo-list">
-            <!-- Tarefas serão adicionadas aqui via JavaScript -->
+            <!-- Tarefas serão carregadas aqui via JavaScript -->
         </ul>
     </div>
 
@@ -171,29 +204,65 @@
         const todoInput = document.getElementById('todo-input');
         const todoList = document.getElementById('todo-list');
 
+        
+        function loadTasks() {
+            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            tasks.forEach(task => {
+                addTaskToDOM(task.text, task.completed);
+            });
+        }
+
+        
+        function saveTasks() {
+            const tasks = [];
+            document.querySelectorAll('#todo-list li').forEach(li => {
+                tasks.push({
+                    text: li.querySelector('.task-text').textContent,
+                    completed: li.querySelector('.task-checkbox').checked
+                });
+            });
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+        }
+
+        
+        function addTaskToDOM(text, completed = false) {
+            const li = document.createElement('li');
+            li.innerHTML = `
+                <input type="checkbox" class="task-checkbox" ${completed ? 'checked' : ''}>
+                <span class="task-text ${completed ? 'completed' : ''}">${text}</span>
+                <button class="delete-btn">×</button>
+            `;
+            todoList.appendChild(li);
+
+            const checkbox = li.querySelector('.task-checkbox');
+            const taskText = li.querySelector('.task-text');
+
+            checkbox.addEventListener('change', function () {
+                taskText.classList.toggle('completed', checkbox.checked);
+                saveTasks();
+            });
+
+            const deleteBtn = li.querySelector('.delete-btn');
+            deleteBtn.addEventListener('click', function () {
+                li.remove();
+                saveTasks();
+            });
+        }
+
+        
         todoForm.addEventListener('submit', function (e) {
             e.preventDefault();
             const newTask = todoInput.value.trim();
 
             if (newTask !== '') {
-                const li = document.createElement('li');
-                li.innerHTML = `
-                    ${newTask}
-                    <button class="delete-btn">Deletar</button>
-                `;
-                todoList.appendChild(li);
+                addTaskToDOM(newTask);
                 todoInput.value = '';
-
-                li.addEventListener('click', function () {
-                    li.classList.toggle('completed');
-                });
-
-                const deleteBtn = li.querySelector('.delete-btn');
-                deleteBtn.addEventListener('click', function () {
-                    li.remove();
-                });
+                saveTasks();
             }
         });
+
+        
+        loadTasks();
     </script>
 </body>
 </html>
