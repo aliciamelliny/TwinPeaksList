@@ -56,6 +56,28 @@
             font-family: 'TwinPeaksFont', 'Oswald', sans-serif;
         }
 
+        .period-container {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .time-section {
+            flex: 1;
+            min-width: 300px;
+            margin: 10px;
+        }
+
+        .time-title {
+            font-family: 'Oswald', sans-serif;
+            color: #1a8f1d;
+            text-shadow: 2px 2px 3px #000;
+            margin-bottom: 15px;
+            font-size: 2rem;
+        }
+
         .input-container, .list-container {
             max-width: 600px;
             width: 100%;
@@ -66,7 +88,7 @@
         }
 
         .input-container {
-            background-image: url('images/Black_Lodge.jpg'); 
+            background-image: url('images/Black_Lodge.jpg');
             background-size: 200px;
             background-position: center;
         }
@@ -75,18 +97,18 @@
             background-color: rgba(0, 0, 0, 0.5);
         }
 
-        #todo-form {
+        .todo-form {
             display: flex;
             justify-content: space-between;
             margin-bottom: 20px;
         }
 
-        #todo-input {
+        .todo-input {
             flex: 1;
             padding: 10px;
             border: 2px solid #d9534f;
             border-radius: 5px;
-            background-color: rgba(51, 51, 51, 0.8); 
+            background-color: rgba(51, 51, 51, 0.8);
             color: #fff;
             font-size: 1em;
         }
@@ -151,11 +173,11 @@
 
         .delete-btn:hover {
             color: #cc0000;
-            background: none; 
+            background: none;
         }
 
         footer {
-            position: fixed; 
+            position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
@@ -182,17 +204,48 @@
         <h2>Diário do Black Lodge</h2>
     </header>
 
-    <div class="input-container">
-        <form id="todo-form">
-            <input type="text" id="todo-input" placeholder="Adicione uma tarefa...">
-            <button type="submit">Adicionar</button>
-        </form>
-    </div>
+    <div class="period-container">
+        <!-- Seção Manhã -->
+        <div class="time-section">
+            <h3 class="time-title">Manhã</h3>
+            <div class="input-container">
+                <form class="todo-form">
+                    <input type="text" class="todo-input" placeholder="Adicione uma tarefa...">
+                    <button type="submit">Adicionar</button>
+                </form>
+            </div>
+            <div class="list-container">
+                <ul class="todo-list"></ul>
+            </div>
+        </div>
 
-    <div class="list-container">
-        <ul id="todo-list">
-            <!-- Tarefas serão carregadas aqui via JavaScript -->
-        </ul>
+        <!-- Seção Tarde -->
+        <div class="time-section">
+            <h3 class="time-title">Tarde</h3>
+            <div class="input-container">
+                <form class="todo-form">
+                    <input type="text" class="todo-input" placeholder="Adicione uma tarefa...">
+                    <button type="submit">Adicionar</button>
+                </form>
+            </div>
+            <div class="list-container">
+                <ul class="todo-list"></ul>
+            </div>
+        </div>
+
+        <!-- Seção Noite -->
+        <div class="time-section">
+            <h3 class="time-title">Noite</h3>
+            <div class="input-container">
+                <form class="todo-form">
+                    <input type="text" class="todo-input" placeholder="Adicione uma tarefa...">
+                    <button type="submit">Adicionar</button>
+                </form>
+            </div>
+            <div class="list-container">
+                <ul class="todo-list"></ul>
+            </div>
+        </div>
     </div>
 
     <footer>
@@ -200,69 +253,59 @@
     </footer>
 
     <script>
-        const todoForm = document.getElementById('todo-form');
-        const todoInput = document.getElementById('todo-input');
-        const todoList = document.getElementById('todo-list');
+        document.querySelectorAll('.todo-form').forEach((form, index) => {
+            const period = ['Manha', 'Tarde', 'Noite'][index];
+            const input = form.querySelector('.todo-input');
+            const list = form.closest('.time-section').querySelector('.todo-list');
 
-        
-        function loadTasks() {
-            const tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            tasks.forEach(task => {
-                addTaskToDOM(task.text, task.completed);
-            });
-        }
-
-        
-        function saveTasks() {
-            const tasks = [];
-            document.querySelectorAll('#todo-list li').forEach(li => {
-                tasks.push({
-                    text: li.querySelector('.task-text').textContent,
-                    completed: li.querySelector('.task-checkbox').checked
-                });
-            });
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-        }
-
-        
-        function addTaskToDOM(text, completed = false) {
-            const li = document.createElement('li');
-            li.innerHTML = `
-                <input type="checkbox" class="task-checkbox" ${completed ? 'checked' : ''}>
-                <span class="task-text ${completed ? 'completed' : ''}">${text}</span>
-                <button class="delete-btn">×</button>
-            `;
-            todoList.appendChild(li);
-
-            const checkbox = li.querySelector('.task-checkbox');
-            const taskText = li.querySelector('.task-text');
-
-            checkbox.addEventListener('change', function () {
-                taskText.classList.toggle('completed', checkbox.checked);
-                saveTasks();
-            });
-
-            const deleteBtn = li.querySelector('.delete-btn');
-            deleteBtn.addEventListener('click', function () {
-                li.remove();
-                saveTasks();
-            });
-        }
-
-        
-        todoForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const newTask = todoInput.value.trim();
-
-            if (newTask !== '') {
-                addTaskToDOM(newTask);
-                todoInput.value = '';
-                saveTasks();
+            function loadTasks() {
+                const tasks = JSON.parse(localStorage.getItem(`tasks${period}`)) || [];
+                tasks.forEach(task => addTaskToDOM(task.text, task.completed, list));
             }
-        });
 
-        
-        loadTasks();
+            function saveTasks() {
+                const tasks = [];
+                list.querySelectorAll('li').forEach(li => {
+                    tasks.push({
+                        text: li.querySelector('.task-text').textContent,
+                        completed: li.querySelector('.task-checkbox').checked
+                    });
+                });
+                localStorage.setItem(`tasks${period}`, JSON.stringify(tasks));
+            }
+
+            function addTaskToDOM(text, completed = false, targetList) {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <input type="checkbox" class="task-checkbox" ${completed ? 'checked' : ''}>
+                    <span class="task-text ${completed ? 'completed' : ''}">${text}</span>
+                    <button class="delete-btn">×</button>
+                `;
+                targetList.appendChild(li);
+
+                li.querySelector('.task-checkbox').addEventListener('change', function() {
+                    li.querySelector('.task-text').classList.toggle('completed', this.checked);
+                    saveTasks();
+                });
+
+                li.querySelector('.delete-btn').addEventListener('click', function() {
+                    li.remove();
+                    saveTasks();
+                });
+            }
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const newTask = input.value.trim();
+                if (newTask) {
+                    addTaskToDOM(newTask, false, list);
+                    input.value = '';
+                    saveTasks();
+                }
+            });
+
+            loadTasks();
+        });
     </script>
 </body>
 </html>
